@@ -5,393 +5,167 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Provider Onboarding Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f4f3ee;
+  --surface: #ffffff;
+  --surface2: #eeede7;
+  --border: #dddcd4;
+  --border-strong: #c4c3bb;
+  --text: #18181b;
+  --text-secondary: #62615c;
+  --text-muted: #9c9b94;
+  --accent: #14342b;
+  --accent-mid: #2d6a4f;
+  --accent-light: #e6f0eb;
+  --green-bg: #d1fae5; --green-text: #064e3b;
+  --red-bg: #fee2e2; --red-text: #7f1d1d;
+  --amber-bg: #fef3c7; --amber-text: #78350f;
+  --blue-bg: #dbeafe; --blue-text: #1e3a8a;
+  --purple-bg: #ede9fe; --purple-text: #4c1d95;
+  --r: 8px; --rl: 12px;
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; min-height: 100vh; }
 
-  :root {
-    --bg: #f5f4f0;
-    --surface: #ffffff;
-    --surface2: #f0efe9;
-    --border: #e2e0d8;
-    --border-strong: #c8c6bc;
-    --text: #1a1917;
-    --text-secondary: #6b6a64;
-    --text-muted: #9c9b95;
-    --accent: #1a3a2a;
-    --accent-light: #e8f0eb;
-    --accent-mid: #4a7c5f;
-    --green: #2d6a4f;
-    --green-bg: #d8f3dc;
-    --green-text: #1b4332;
-    --red: #c1121f;
-    --red-bg: #ffe5e5;
-    --red-text: #7d0000;
-    --amber: #b45309;
-    --amber-bg: #fef3c7;
-    --amber-text: #78350f;
-    --blue: #1e40af;
-    --blue-bg: #dbeafe;
-    --blue-text: #1e3a8a;
-    --purple: #6d28d9;
-    --purple-bg: #ede9fe;
-    --purple-text: #4c1d95;
-    --radius: 8px;
-    --radius-lg: 12px;
-  }
+/* HEADER */
+.hdr { background: var(--accent); color: #fff; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 200; }
+.hdr-title { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
+.hdr-sub { font-size: 11px; opacity: 0.55; margin-top: 1px; }
+.hdr-right { display: flex; align-items: center; gap: 16px; }
+.refresh-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 5px 12px; border-radius: var(--r); cursor: pointer; transition: background 0.15s; }
+.refresh-btn:hover { background: rgba(255,255,255,0.2); }
+.last-upd { font-size: 11px; opacity: 0.45; font-family: 'DM Mono', monospace; }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 14px;
-    line-height: 1.5;
-    min-height: 100vh;
-  }
+/* FILTER BAR */
+.filters { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.fl { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; white-space: nowrap; }
+.fg { display: flex; align-items: center; gap: 6px; }
+select { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 5px 10px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); color: var(--text); cursor: pointer; outline: none; }
+select:focus { border-color: var(--accent-mid); box-shadow: 0 0 0 2px rgba(45,106,79,0.12); }
 
-  /* HEADER */
-  .header {
-    background: var(--accent);
-    color: white;
-    padding: 16px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-  .header-title {
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
-  .header-sub {
-    font-size: 12px;
-    opacity: 0.6;
-    margin-top: 1px;
-  }
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .last-updated {
-    font-size: 11px;
-    opacity: 0.5;
-    font-family: 'DM Mono', monospace;
-  }
+/* MULTI-SELECT DROPDOWN */
+.ms-wrap { position: relative; }
+.ms-btn { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 5px 28px 5px 10px; border: 1px solid var(--border); border-radius: var(--r); background: var(--surface); color: var(--text); cursor: pointer; min-width: 180px; text-align: left; outline: none; position: relative; }
+.ms-btn::after { content: '▾'; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--text-muted); }
+.ms-btn:focus { border-color: var(--accent-mid); }
+.ms-dropdown { position: absolute; top: calc(100% + 4px); left: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--rl); box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 300; min-width: 220px; padding: 6px; display: none; }
+.ms-dropdown.open { display: block; }
+.ms-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: var(--r); cursor: pointer; font-size: 13px; transition: background 0.1s; }
+.ms-item:hover { background: var(--surface2); }
+.ms-item input[type=checkbox] { accent-color: var(--accent-mid); width: 14px; height: 14px; cursor: pointer; }
+.ms-divider { height: 1px; background: var(--border); margin: 4px 0; }
 
-  /* FILTERS */
-  .filters-bar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 12px 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .filter-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    white-space: nowrap;
-  }
-  .filter-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  select, input[type="date"] {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    padding: 6px 10px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--surface);
-    color: var(--text);
-    cursor: pointer;
-    outline: none;
-    transition: border-color 0.15s;
-  }
-  select:hover, input[type="date"]:hover { border-color: var(--border-strong); }
-  select:focus, input[type="date"]:focus { border-color: var(--accent-mid); box-shadow: 0 0 0 2px rgba(74,124,95,0.15); }
+/* VIEW TOGGLE */
+.vt { display: flex; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin-left: auto; }
+.vt-btn { padding: 5px 14px; font-size: 12px; font-weight: 500; cursor: pointer; background: none; border: none; color: var(--text-secondary); transition: all 0.15s; }
+.vt-btn.active { background: var(--accent); color: #fff; }
 
-  /* TEAM TABS */
-  .team-tabs {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    display: flex;
-    gap: 0;
-    overflow-x: auto;
-  }
-  .team-tab {
-    padding: 10px 16px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    white-space: nowrap;
-    transition: all 0.15s;
-    user-select: none;
-  }
-  .team-tab:hover { color: var(--text); background: var(--surface2); }
-  .team-tab.active { color: var(--accent); border-bottom-color: var(--accent-mid); }
+/* TEAM TABS */
+.tabs { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { padding: 10px 15px; font-size: 12.5px; font-weight: 500; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all 0.15s; user-select: none; }
+.tab:hover { color: var(--text); background: var(--surface2); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent-mid); }
 
-  /* MAIN CONTENT */
-  .main { padding: 20px 24px; max-width: 1400px; }
+/* MAIN */
+.main { padding: 20px 24px; }
 
-  /* COHORT SUMMARY */
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-  .section-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-  .cohort-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 12px;
-    margin-bottom: 28px;
-  }
-  .cohort-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-  }
-  .cohort-card-header {
-    background: var(--accent);
-    color: white;
-    padding: 12px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-  }
-  .cohort-date {
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
-  .cohort-category {
-    font-size: 11px;
-    opacity: 0.65;
-    margin-top: 2px;
-  }
-  .countdown-badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    background: rgba(255,255,255,0.15);
-    padding: 3px 8px;
-    border-radius: 20px;
-    white-space: nowrap;
-  }
-  .cohort-card-body { padding: 12px 16px; }
-  .cohort-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .stat-box {
-    background: var(--surface2);
-    border-radius: var(--radius);
-    padding: 8px 10px;
-    text-align: center;
-  }
-  .stat-value {
-    font-size: 20px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    font-family: 'DM Mono', monospace;
-  }
-  .stat-label {
-    font-size: 10px;
-    color: var(--text-muted);
-    margin-top: 2px;
-    line-height: 1.3;
-  }
-  .go-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 9px;
-    border-radius: 20px;
-  }
-  .go-badge.go { background: var(--green-bg); color: var(--green-text); }
-  .go-badge.nogo { background: var(--red-bg); color: var(--red-text); }
-  .go-badge.pending { background: var(--amber-bg); color: var(--amber-text); }
+/* LOADING / ERROR */
+.loading { text-align: center; padding: 60px 24px; color: var(--text-muted); font-size: 13px; }
+.loading .spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--accent-mid); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-box { background: var(--red-bg); color: var(--red-text); border-radius: var(--rl); padding: 16px 20px; font-size: 13px; margin-bottom: 20px; }
 
-  /* PROVIDER TABLE */
-  .table-section { margin-bottom: 32px; }
-  .table-wrapper {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-  }
-  .table-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  .table-count {
-    font-size: 12px;
-    color: var(--text-muted);
-    font-family: 'DM Mono', monospace;
-  }
-  .search-input {
-    padding: 5px 10px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    font-size: 12px;
-    width: 200px;
-  }
-  .table-scroll { overflow-x: auto; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12.5px;
-    min-width: 600px;
-  }
-  thead th {
-    background: var(--surface2);
-    padding: 8px 12px;
-    text-align: left;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-    user-select: none;
-    position: sticky;
-    top: 0;
-  }
-  thead th:hover { background: var(--border); }
-  thead th .sort-icon { opacity: 0.4; margin-left: 3px; }
-  thead th.sorted .sort-icon { opacity: 1; color: var(--accent-mid); }
-  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: var(--surface2); }
-  tbody td { padding: 8px 12px; color: var(--text); vertical-align: middle; }
-  .provider-name { font-weight: 500; }
-  .npi-code { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
-  .pill {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 7px;
-    border-radius: 20px;
-  }
-  .pill-green { background: var(--green-bg); color: var(--green-text); }
-  .pill-red { background: var(--red-bg); color: var(--red-text); }
-  .pill-amber { background: var(--amber-bg); color: var(--amber-text); }
-  .pill-blue { background: var(--blue-bg); color: var(--blue-text); }
-  .pill-gray { background: var(--surface2); color: var(--text-secondary); }
-  .pill-purple { background: var(--purple-bg); color: var(--purple-text); }
-  .empty-state {
-    text-align: center;
-    padding: 48px 24px;
-    color: var(--text-muted);
-    font-size: 13px;
-  }
-  .divider {
-    height: 1px;
-    background: var(--border);
-    margin: 24px 0;
-  }
+/* SECTION HEADER */
+.sec-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; margin-top: 24px; }
+.sec-hdr:first-child { margin-top: 0; }
+.sec-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; }
 
-  /* TEAM PANEL */
-  .team-panel { display: none; }
-  .team-panel.active { display: block; }
+/* COHORT CARDS */
+.cohort-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-bottom: 32px; }
+.cc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--rl); overflow: hidden; }
+.cc-head { background: var(--accent); color: #fff; padding: 12px 16px; display: flex; justify-content: space-between; align-items: flex-start; }
+.cc-date { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
+.cc-cat { font-size: 10px; opacity: 0.6; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+.cd-badge { font-family: 'DM Mono', monospace; font-size: 11px; background: rgba(255,255,255,0.14); padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+.cc-body { padding: 12px 16px; }
+.cc-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(72px, 1fr)); gap: 7px; margin-top: 8px; }
+.stat { background: var(--surface2); border-radius: var(--r); padding: 8px 8px 6px; text-align: center; }
+.stat-v { font-size: 17px; font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: -0.02em; line-height: 1.2; }
+.stat-v.sm { font-size: 11px; font-weight: 600; font-family: 'DM Sans', sans-serif; }
+.stat-l { font-size: 9px; color: var(--text-muted); margin-top: 3px; line-height: 1.3; text-transform: uppercase; letter-spacing: 0.04em; }
+.go { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+.go.go-yes { background: var(--green-bg); color: var(--green-text); }
+.go.go-no { background: var(--red-bg); color: var(--red-text); }
+.go.go-pend { background: var(--amber-bg); color: var(--amber-text); }
 
-  /* RESPONSIVE */
-  @media (max-width: 768px) {
-    .header { padding: 12px 16px; }
-    .filters-bar { padding: 10px 16px; }
-    .main { padding: 16px; }
-    .cohort-grid { grid-template-columns: 1fr; }
-  }
+/* TABLE */
+.tbl-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--rl); overflow: hidden; margin-bottom: 32px; }
+.tbl-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+thead th { background: var(--surface2); padding: 8px 11px; text-align: left; font-size: 10px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; }
+thead th:hover { background: var(--border); }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.08s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface2); }
+tbody td { padding: 7px 11px; vertical-align: middle; color: var(--text); }
+.pname { font-weight: 500; white-space: nowrap; }
+.npi { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); }
+.pill { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; white-space: nowrap; }
+.p-green { background: var(--green-bg); color: var(--green-text); }
+.p-red { background: var(--red-bg); color: var(--red-text); }
+.p-amber { background: var(--amber-bg); color: var(--amber-text); }
+.p-blue { background: var(--blue-bg); color: var(--blue-text); }
+.p-gray { background: var(--surface2); color: var(--text-secondary); }
+.p-purple { background: var(--purple-bg); color: var(--purple-text); }
+.empty { text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px; }
 
-  .view-toggle {
-    display: flex;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-  .view-btn {
-    padding: 5px 12px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    transition: all 0.15s;
-  }
-  .view-btn.active { background: var(--accent); color: white; }
-
-  .no-providers {
-    padding: 32px;
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 13px;
-  }
+@media (max-width: 768px) {
+  .hdr, .filters, .main { padding-left: 16px; padding-right: 16px; }
+  .tabs { padding: 0 16px; }
+  .cohort-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
 
-<header class="header">
+<header class="hdr">
   <div>
-    <div class="header-title">Provider Onboarding Dashboard</div>
-    <div class="header-sub">Cohort tracking &amp; team readiness</div>
+    <div class="hdr-title">Provider Onboarding Dashboard</div>
+    <div class="hdr-sub">Live from Google Sheets · Cohort tracking &amp; team readiness</div>
   </div>
-  <div class="header-right">
-    <span class="last-updated" id="lastUpdated"></span>
+  <div class="hdr-right">
+    <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
+    <span class="last-upd" id="lastUpd">—</span>
   </div>
 </header>
 
-<div class="filters-bar">
-  <span class="filter-label">Filters</span>
-  <div class="filter-group">
-    <label class="filter-label" for="filterStartDate">Start Date</label>
-    <input type="date" id="filterStartDate" onchange="applyFilters()">
+<div class="filters">
+  <span class="fl">Filters</span>
+
+  <div class="fg">
+    <span class="fl">Start Date</span>
+    <div class="ms-wrap" id="dateWrap">
+      <button class="ms-btn" id="dateBtn" onclick="toggleDropdown('dateDD')">All Dates</button>
+      <div class="ms-dropdown" id="dateDD"></div>
+    </div>
   </div>
-  <div class="filter-group">
-    <label class="filter-label" for="filterProviderType">Provider Type</label>
-    <select id="filterProviderType" onchange="applyFilters()">
+
+  <div class="fg">
+    <span class="fl">Provider Type</span>
+    <select id="typeFilter" onchange="applyFilters()">
       <option value="">All Types</option>
-      <option>MD</option>
-      <option>DO</option>
-      <option>NP</option>
-      <option>PA</option>
-      <option>LCSW</option>
-      <option>Psychiatrist</option>
+      <option value="MD/DO">MD/DO</option>
+      <option value="PMHNP">PMHNP</option>
+      <option value="Therapist">Therapist</option>
     </select>
   </div>
-  <div class="filter-group">
-    <label class="filter-label" for="filterTeam">Team</label>
-    <select id="filterTeam" onchange="switchTeam(this.value)">
+
+  <div class="fg">
+    <span class="fl">Team</span>
+    <select id="teamFilter" onchange="switchTeamSelect(this.value)">
       <option value="all">All Teams</option>
       <option value="talent">Talent Acquisition</option>
       <option value="licensing">Licensing</option>
@@ -403,362 +177,411 @@
       <option value="credentialing">Credentialing</option>
     </select>
   </div>
-  <div style="margin-left:auto;" class="view-toggle">
-    <button class="view-btn active" onclick="setView('cohort',this)">Cohort Summary</button>
-    <button class="view-btn" onclick="setView('detail',this)">Detail View</button>
+
+  <div class="vt">
+    <button class="vt-btn active" id="vbCohort" onclick="setView('cohort',this)">Cohort Summary</button>
+    <button class="vt-btn" id="vbDetail" onclick="setView('detail',this)">Detail View</button>
   </div>
 </div>
 
-<div class="team-tabs" id="teamTabs">
-  <div class="team-tab active" data-team="all" onclick="switchTeamTab('all')">All Teams</div>
-  <div class="team-tab" data-team="talent" onclick="switchTeamTab('talent')">Talent Acquisition</div>
-  <div class="team-tab" data-team="licensing" onclick="switchTeamTab('licensing')">Licensing</div>
-  <div class="team-tab" data-team="informatics" onclick="switchTeamTab('informatics')">Clinical Informatics</div>
-  <div class="team-tab" data-team="coreops" onclick="switchTeamTab('coreops')">Core Operations</div>
-  <div class="team-tab" data-team="it" onclick="switchTeamTab('it')">IT</div>
-  <div class="team-tab" data-team="hr" onclick="switchTeamTab('hr')">HR</div>
-  <div class="team-tab" data-team="marketing" onclick="switchTeamTab('marketing')">Digital Marketing</div>
-  <div class="team-tab" data-team="credentialing" onclick="switchTeamTab('credentialing')">Credentialing</div>
+<div class="tabs" id="teamTabs">
+  <div class="tab active" data-team="all" onclick="switchTeamTab('all')">All Teams</div>
+  <div class="tab" data-team="talent" onclick="switchTeamTab('talent')">Talent Acquisition</div>
+  <div class="tab" data-team="licensing" onclick="switchTeamTab('licensing')">Licensing</div>
+  <div class="tab" data-team="informatics" onclick="switchTeamTab('informatics')">Clinical Informatics</div>
+  <div class="tab" data-team="coreops" onclick="switchTeamTab('coreops')">Core Operations</div>
+  <div class="tab" data-team="it" onclick="switchTeamTab('it')">IT</div>
+  <div class="tab" data-team="hr" onclick="switchTeamTab('hr')">HR</div>
+  <div class="tab" data-team="marketing" onclick="switchTeamTab('marketing')">Digital Marketing</div>
+  <div class="tab" data-team="credentialing" onclick="switchTeamTab('credentialing')">Credentialing</div>
 </div>
 
-<div class="main" id="mainContent"></div>
+<div class="main" id="main">
+  <div class="loading"><div class="spinner"></div>Loading data from Google Sheets…</div>
+</div>
 
 <script>
-// ─── SAMPLE DATA ───────────────────────────────────────────────────────────
-const COHORTS = [
-  {
-    startDate: '2025-07-07', category: 'Physician', goNogo: 'go',
-    openMarkets: 3, completeMarkets: 5, incompleteMarkets: 2,
-    credDate: '2025-06-15', schedBlocks: 'Complete', patientSched: 14, techSetup: 'Complete', adpSetup: 'Complete', profilesActivated: 8
-  },
-  {
-    startDate: '2025-08-04', category: 'NP/PA', goNogo: 'pending',
-    openMarkets: 1, completeMarkets: 3, incompleteMarkets: 5,
-    credDate: '2025-07-20', schedBlocks: 'In Progress', patientSched: 0, techSetup: 'In Progress', adpSetup: 'Complete', profilesActivated: 2
-  },
-  {
-    startDate: '2025-09-08', category: 'Mixed', goNogo: 'nogo',
-    openMarkets: 0, completeMarkets: 1, incompleteMarkets: 9,
-    credDate: 'TBD', schedBlocks: 'Not Started', patientSched: 0, techSetup: 'Not Started', adpSetup: 'Not Started', profilesActivated: 0
+// ── CONFIG ────────────────────────────────────────────────────────────────
+const SHEET_ID = '2PACX-1vSZ57mblhXx0_qJUd4EwGvBZmfqhIN6rR1Ns7CHmKriQEIPyTmqRpdVOzjPWaeRcH3EbfhD17e0TJzw';
+const BASE = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?output=csv`;
+const COHORT_URL = `${BASE}&gid=0`;   // will try both tab approaches
+const OVERVIEW_URL = `${BASE}&gid=1`;
+
+// Tab name approach (more reliable):
+const COHORT_URL_NAME  = `${BASE}&single=true&sheet=Cohort%20Summary`;
+const OVERVIEW_URL_NAME = `${BASE}&single=true&sheet=Provider%20Onboarding%20Overview`;
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let rawCohorts = [], rawProviders = [];
+let currentTeam = 'all', currentView = 'cohort';
+let selectedDates = new Set(); // empty = all
+
+// ── CSV PARSER ────────────────────────────────────────────────────────────
+function parseCSV(text) {
+  const lines = text.split('\n');
+  if (lines.length < 2) return [];
+  const headers = splitCSVRow(lines[0]).map(h => h.trim().replace(/^"|"$/g,''));
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = splitCSVRow(lines[i]).map(v => v.trim().replace(/^"|"$/g,''));
+    if (vals.every(v => !v)) continue;
+    const obj = {};
+    headers.forEach((h, idx) => { obj[h] = vals[idx] || ''; });
+    rows.push(obj);
   }
-];
+  return rows;
+}
 
-const PROVIDERS = [
-  {
-    name: 'Dr. Sarah Chen', type: 'MD', npi: '1234567890', chief: 'Dr. Marcus Webb',
-    fte: 1.0, signDate: '2025-04-15', startDate: '2025-07-07', withdrawDate: '',
-    completeLicenses: 5, incompleteLicenses: 0, activeLicenses: 5, openMarkets: ['NY','CA','TX'],
-    openMarketsCount: 3, licensesAvailable: 5, inProgressLicenses: 0,
-    activeDeas: 2, inProgressDeas: 0, activeCsrs: 2, inProgressCsrs: 0,
-    nyOrTx: 'NY', credDate: '2025-06-15',
-    primaryMarket: 'New York', schedCreated: true, laptopSetup: true,
-    w1Patients: 18, w2Patients: 22, w3Patients: 25, w4Patients: 24, totalPatients: 89,
-    adpSetup: true,
-    synapseProfile: 'Active', synapseLoc: 'NY-Manhattan', matchingEnabled: true,
-    newPatientEnabled: true, npMax: 30, adhdEnabled: true, csDisabled: false
-  },
-  {
-    name: 'James Okafor, NP', type: 'NP', npi: '0987654321', chief: 'Dr. Lisa Park',
-    fte: 0.8, signDate: '2025-04-28', startDate: '2025-07-07', withdrawDate: '',
-    completeLicenses: 3, incompleteLicenses: 2, activeLicenses: 3, openMarkets: ['FL','GA'],
-    openMarketsCount: 2, licensesAvailable: 3, inProgressLicenses: 2,
-    activeDeas: 1, inProgressDeas: 1, activeCsrs: 1, inProgressCsrs: 1,
-    nyOrTx: '', credDate: '2025-06-15',
-    primaryMarket: 'Florida', schedCreated: true, laptopSetup: false,
-    w1Patients: 12, w2Patients: 15, w3Patients: 18, w4Patients: 20, totalPatients: 65,
-    adpSetup: true,
-    synapseProfile: 'Pending', synapseLoc: 'FL-Miami', matchingEnabled: false,
-    newPatientEnabled: false, npMax: 25, adhdEnabled: false, csDisabled: false
-  },
-  {
-    name: 'Dr. Priya Nair', type: 'DO', npi: '1122334455', chief: 'Dr. Marcus Webb',
-    fte: 1.0, signDate: '2025-05-01', startDate: '2025-08-04', withdrawDate: '',
-    completeLicenses: 4, incompleteLicenses: 1, activeLicenses: 4, openMarkets: ['TX'],
-    openMarketsCount: 1, licensesAvailable: 4, inProgressLicenses: 1,
-    activeDeas: 2, inProgressDeas: 0, activeCsrs: 1, inProgressCsrs: 1,
-    nyOrTx: 'TX', credDate: '2025-07-20',
-    primaryMarket: 'Texas', schedCreated: false, laptopSetup: false,
-    w1Patients: 0, w2Patients: 0, w3Patients: 0, w4Patients: 0, totalPatients: 0,
-    adpSetup: false,
-    synapseProfile: 'Not Started', synapseLoc: 'TX-Houston', matchingEnabled: false,
-    newPatientEnabled: false, npMax: 28, adhdEnabled: false, csDisabled: true
-  },
-  {
-    name: 'Rachel Torres, PA', type: 'PA', npi: '5566778899', chief: 'Dr. Lisa Park',
-    fte: 0.6, signDate: '2025-05-10', startDate: '2025-08-04', withdrawDate: '',
-    completeLicenses: 2, incompleteLicenses: 3, activeLicenses: 2, openMarkets: ['NY','NJ'],
-    openMarketsCount: 2, licensesAvailable: 2, inProgressLicenses: 3,
-    activeDeas: 0, inProgressDeas: 2, activeCsrs: 0, inProgressCsrs: 2,
-    nyOrTx: 'NY', credDate: '2025-07-20',
-    primaryMarket: 'New Jersey', schedCreated: false, laptopSetup: false,
-    w1Patients: 0, w2Patients: 0, w3Patients: 0, w4Patients: 0, totalPatients: 0,
-    adpSetup: false,
-    synapseProfile: 'Not Started', synapseLoc: 'NJ-Newark', matchingEnabled: false,
-    newPatientEnabled: false, npMax: 20, adhdEnabled: false, csDisabled: false
-  },
-  {
-    name: 'Dr. Kevin Zhao', type: 'Psychiatrist', npi: '9900112233', chief: 'Dr. Marcus Webb',
-    fte: 1.0, signDate: '2025-05-20', startDate: '2025-09-08', withdrawDate: '',
-    completeLicenses: 1, incompleteLicenses: 4, activeLicenses: 1, openMarkets: ['CA'],
-    openMarketsCount: 1, licensesAvailable: 1, inProgressLicenses: 4,
-    activeDeas: 0, inProgressDeas: 1, activeCsrs: 0, inProgressCsrs: 1,
-    nyOrTx: '', credDate: 'TBD',
-    primaryMarket: 'California', schedCreated: false, laptopSetup: false,
-    w1Patients: 0, w2Patients: 0, w3Patients: 0, w4Patients: 0, totalPatients: 0,
-    adpSetup: false,
-    synapseProfile: 'Not Started', synapseLoc: 'CA-Los Angeles', matchingEnabled: false,
-    newPatientEnabled: false, npMax: 22, adhdEnabled: true, csDisabled: false
+function splitCSVRow(row) {
+  const result = []; let cur = ''; let inQ = false;
+  for (let i = 0; i < row.length; i++) {
+    const ch = row[i];
+    if (ch === '"') { inQ = !inQ; }
+    else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
+    else { cur += ch; }
   }
-];
+  result.push(cur);
+  return result;
+}
 
-// ─── STATE ──────────────────────────────────────────────────────────────────
-let currentTeam = 'all';
-let currentView = 'cohort';
-let filterDate = '';
-let filterType = '';
+// ── FETCH ─────────────────────────────────────────────────────────────────
+async function fetchSheet(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return parseCSV(await res.text());
+}
 
-// ─── UTILS ──────────────────────────────────────────────────────────────────
-function countdown(dateStr) {
-  if (!dateStr || dateStr === 'TBD') return 'TBD';
-  const diff = Math.ceil((new Date(dateStr) - new Date()) / 86400000);
+async function loadData() {
+  document.getElementById('main').innerHTML = '<div class="loading"><div class="spinner"></div>Loading data from Google Sheets…</div>';
+  try {
+    const [cohorts, providers] = await Promise.all([
+      fetchSheet(COHORT_URL_NAME),
+      fetchSheet(OVERVIEW_URL_NAME)
+    ]);
+    rawCohorts = cohorts;
+    rawProviders = providers;
+    document.getElementById('lastUpd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
+    buildDateFilter();
+    render();
+  } catch(e) {
+    document.getElementById('main').innerHTML = `<div class="error-box">⚠ Could not load data: ${e.message}. Make sure your Google Sheet is published to the web.</div>`;
+  }
+}
+
+// ── DATE FILTER ───────────────────────────────────────────────────────────
+function buildDateFilter() {
+  const now = new Date();
+  const cutoff = new Date(now); cutoff.setMonth(cutoff.getMonth() - 3);
+
+  // Collect dates from both tables
+  const allDates = new Set();
+  [...rawCohorts, ...rawProviders].forEach(r => {
+    const d = r['Start Date (Cohort)'];
+    if (d) allDates.add(d);
+  });
+
+  // Filter: within past 3 months or in the future
+  const validDates = [...allDates].filter(d => {
+    const dt = parseDate(d);
+    return dt && dt >= cutoff;
+  }).sort((a,b) => parseDate(a) - parseDate(b));
+
+  const dd = document.getElementById('dateDD');
+  dd.innerHTML = `
+    <div class="ms-item" onclick="toggleAllDates()">
+      <input type="checkbox" id="chk-all" checked> <label for="chk-all" style="cursor:pointer;font-weight:500">All Dates</label>
+    </div>
+    <div class="ms-divider"></div>
+    ${validDates.map(d => `
+      <div class="ms-item" onclick="toggleDate('${d}')">
+        <input type="checkbox" id="chk-${d.replace(/\//g,'-')}" checked> <label for="chk-${d.replace(/\//g,'-')}" style="cursor:pointer">${fmtDate(d)}</label>
+      </div>`).join('')}
+  `;
+  selectedDates = new Set(); // empty = all selected
+  updateDateBtn();
+}
+
+function toggleDropdown(id) {
+  const dd = document.getElementById(id);
+  dd.classList.toggle('open');
+  // close on outside click
+  const close = e => { if (!dd.contains(e.target) && e.target.id !== 'dateBtn') { dd.classList.remove('open'); document.removeEventListener('click', close); } };
+  setTimeout(() => document.addEventListener('click', close), 0);
+}
+
+function toggleAllDates() {
+  const allChk = document.getElementById('chk-all');
+  const all = allChk.checked;
+  // Toggle all checkboxes
+  document.querySelectorAll('#dateDD input[type=checkbox]').forEach(c => c.checked = all);
+  selectedDates = new Set();
+  updateDateBtn(); applyFilters();
+}
+
+function toggleDate(d) {
+  event.stopPropagation();
+  const chk = document.getElementById('chk-' + d.replace(/\//g,'-'));
+  chk.checked = !chk.checked;
+  if (chk.checked) selectedDates.delete(d);
+  else selectedDates.add(d); // store excluded
+  // update "all" checkbox
+  const allChecked = [...document.querySelectorAll('#dateDD input[type=checkbox]')].slice(1).every(c => c.checked);
+  document.getElementById('chk-all').checked = allChecked;
+  updateDateBtn(); applyFilters();
+}
+
+function updateDateBtn() {
+  const total = document.querySelectorAll('#dateDD input[type=checkbox]').length - 1;
+  const excluded = selectedDates.size;
+  const selected = total - excluded;
+  document.getElementById('dateBtn').textContent = excluded === 0 ? 'All Dates' : `${selected} date${selected!==1?'s':''} selected`;
+}
+
+// ── FILTER LOGIC ──────────────────────────────────────────────────────────
+function applyFilters() { render(); }
+
+function getType() { return document.getElementById('typeFilter').value; }
+
+function filterProviders() {
+  const type = getType();
+  return rawProviders.filter(p => {
+    const d = p['Start Date (Cohort)'];
+    if (selectedDates.size && selectedDates.has(d)) return false;
+    if (type) {
+      const pt = (p['Provider Type'] || '').toUpperCase();
+      if (type === 'MD/DO' && !['MD','DO'].includes(pt)) return false;
+      if (type === 'PMHNP' && pt !== 'PMHNP') return false;
+      if (type === 'Therapist' && !['LCSW','LMFT','LPCC','THERAPIST','LMHC'].includes(pt)) return false;
+    }
+    return true;
+  });
+}
+
+function filterCohorts() {
+  return rawCohorts.filter(c => {
+    const d = c['Start Date (Cohort)'];
+    if (selectedDates.size && selectedDates.has(d)) return false;
+    return true;
+  });
+}
+
+// ── DATE UTILS ────────────────────────────────────────────────────────────
+function parseDate(s) {
+  if (!s) return null;
+  const d = new Date(s);
+  return isNaN(d) ? null : d;
+}
+
+function fmtDate(s) {
+  if (!s) return '—';
+  const d = new Date(s + (s.includes('T') ? '' : 'T00:00:00'));
+  if (isNaN(d)) return s;
+  return d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+}
+
+function countdown(s) {
+  if (!s) return '—';
+  const d = new Date(s + 'T00:00:00');
+  if (isNaN(d)) return s;
+  const diff = Math.ceil((d - new Date()) / 86400000);
   if (diff < 0) return `${Math.abs(diff)}d ago`;
   if (diff === 0) return 'Today';
   return `${diff}d`;
 }
 
-function fmt(dateStr) {
-  if (!dateStr) return '—';
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+// ── PILL HELPERS ──────────────────────────────────────────────────────────
+function boolPill(v, yes='Complete', no='Pending') {
+  const u = (v||'').toUpperCase().trim();
+  if (['YES','TRUE','COMPLETE','ACTIVE','CREATED','READY','X','✓'].includes(u))
+    return `<span class="pill p-green">${yes}</span>`;
+  if (['IN PROGRESS','PENDING','PARTIAL'].includes(u))
+    return `<span class="pill p-amber">In Progress</span>`;
+  if (['NO','FALSE','INCOMPLETE','NOT STARTED',''].includes(u) || !v)
+    return `<span class="pill p-red">${no}</span>`;
+  return `<span class="pill p-gray">${v}</span>`;
 }
 
-function boolPill(val, trueLabel, falseLabel) {
-  if (val === true || val === 'Complete' || val === 'Active') {
-    return `<span class="pill pill-green">${trueLabel || '✓'}</span>`;
-  }
-  if (val === 'In Progress' || val === 'Pending') {
-    return `<span class="pill pill-amber">${val}</span>`;
-  }
-  if (val === false || val === 'Not Started') {
-    return `<span class="pill pill-red">${falseLabel || '—'}</span>`;
-  }
-  return `<span class="pill pill-gray">${val}</span>`;
+function gonogoPill(v) {
+  const u = (v||'').toUpperCase().trim();
+  if (u === 'GO' || u === 'YES') return `<span class="go go-yes">Go ✓</span>`;
+  if (u === 'NO GO' || u === 'NO' || u === 'NOGO') return `<span class="go go-no">No-Go ✗</span>`;
+  return `<span class="go go-pend">${v||'Pending'}</span>`;
 }
 
-function getFilteredProviders() {
-  return PROVIDERS.filter(p => {
-    if (filterDate && p.startDate !== filterDate) return false;
-    if (filterType && p.type !== filterType) return false;
-    return true;
-  });
+function numPill(v) {
+  const n = parseInt(v);
+  if (isNaN(n)) return v || '—';
+  if (n === 0) return `<span class="pill p-green">0</span>`;
+  return v;
 }
 
-function getFilteredCohorts() {
-  return COHORTS.filter(c => {
-    if (filterDate && c.startDate !== filterDate) return false;
-    return true;
-  });
-}
-
-// ─── COHORT CARD BUILDER ────────────────────────────────────────────────────
+// ── COHORT CARD ───────────────────────────────────────────────────────────
 function buildCohortCard(c, team) {
-  const cd = countdown(c.startDate);
-  const cdClass = cd.includes('ago') ? 'style="color:#c1121f"' : '';
-  const goLabel = c.goNogo === 'go' ? 'Go ✓' : c.goNogo === 'nogo' ? 'No-Go ✗' : 'Pending';
-  const goClass = c.goNogo;
+  const sd = c['Start Date (Cohort)'] || '';
+  const cd = countdown(sd);
+  const cdColor = cd.includes('ago') ? 'color:rgba(255,100,100,0.9)' : '';
+  const gono = c['Go/No Go'] || '';
 
-  let stats = `<div class="stat-box"><div class="stat-value go-badge ${goClass}">${goLabel}</div><div class="stat-label">Go / No-Go</div></div>`;
+  const statB = (v, l) => `<div class="stat"><div class="stat-v sm">${v||'—'}</div><div class="stat-l">${l}</div></div>`;
+  const numB  = (v, l) => `<div class="stat"><div class="stat-v">${v||'0'}</div><div class="stat-l">${l}</div></div>`;
 
-  const statBlock = (val, label) =>
-    `<div class="stat-box"><div class="stat-value">${val}</div><div class="stat-label">${label}</div></div>`;
-
+  let extra = '';
   if (team === 'all' || team === 'talent') {
-    stats += statBlock(c.openMarkets, 'Open Markets') + statBlock(c.completeMarkets, 'Complete Markets') + statBlock(c.incompleteMarkets, 'Incomplete');
+    extra = numB(c['Open Markets'],'Open Markets') + numB(c['Complete Markets Available to Turn On'],'Complete') + numB(c['Incomplete Markets'],'Incomplete');
   } else if (team === 'licensing') {
-    stats += statBlock(c.openMarkets, 'Open Markets') + statBlock(c.completeMarkets, 'Complete') + statBlock(c.incompleteMarkets, 'Incomplete') + statBlock(c.credDate !== 'TBD' ? fmt(c.credDate) : 'TBD', 'Cred. Date');
+    extra = numB(c['Open Markets'],'Open Markets') + numB(c['Complete Markets Available to Turn On'],'Complete') + numB(c['Incomplete Markets'],'Incomplete') + statB(fmtDate(c['Credentialing Date']),'Cred. Date');
   } else if (team === 'informatics') {
-    stats += statBlock(c.schedBlocks, 'Schedule & Blocks');
+    extra = statB(c['Provider Schedule and Blocks']||'—','Schedule & Blocks');
   } else if (team === 'coreops') {
-    stats += statBlock(c.patientSched, 'Wk 1 Patients');
+    extra = statB(c['Patient Scheduling (Week 1)']||'—','Wk 1 Scheduling');
   } else if (team === 'it') {
-    stats += statBlock(c.techSetup, 'Tech Setup');
+    extra = statB(c['Technology Set Up']||'—','Tech Setup');
   } else if (team === 'hr') {
-    stats += statBlock(c.adpSetup, 'ADP Setup');
+    extra = statB(c['ADP Set Up']||'—','ADP Setup');
   } else if (team === 'marketing') {
-    stats += statBlock(c.profilesActivated, 'Profiles Activated');
+    extra = numB(c['Profiles Activated']||'0','Profiles Activated');
   } else if (team === 'credentialing') {
-    stats += statBlock(c.credDate !== 'TBD' ? fmt(c.credDate) : 'TBD', 'Credentialing Date');
+    extra = statB(fmtDate(c['Credentialing Date']),'Credentialing Date');
   }
 
-  return `<div class="cohort-card">
-    <div class="cohort-card-header">
+  return `<div class="cc">
+    <div class="cc-head">
       <div>
-        <div class="cohort-date">${fmt(c.startDate)}</div>
-        <div class="cohort-category">${c.category}</div>
+        <div class="cc-date">${fmtDate(sd)}</div>
+        <div class="cc-cat">${c['Cohort Category']||''}</div>
       </div>
-      <div class="countdown-badge" ${cdClass}>${cd}</div>
+      <div class="cd-badge" style="${cdColor}">${cd}</div>
     </div>
-    <div class="cohort-card-body">
-      <div class="cohort-stats">${stats}</div>
+    <div class="cc-body">
+      <div class="cc-stats">
+        <div class="stat"><div class="stat-v sm">${gonogoPill(gono)}</div><div class="stat-l">Go / No-Go</div></div>
+        ${extra}
+      </div>
     </div>
   </div>`;
 }
 
-// ─── TABLE COLUMN CONFIGS ───────────────────────────────────────────────────
+// ── TABLE COLUMNS ─────────────────────────────────────────────────────────
 const BASE_COLS = [
-  { label: 'Name', render: p => `<span class="provider-name">${p.name}</span>` },
-  { label: 'Type', render: p => `<span class="pill pill-blue">${p.type}</span>` },
-  { label: 'NPI', render: p => `<span class="npi-code">${p.npi}</span>` },
-  { label: 'Chief', render: p => p.chief },
-  { label: 'FTE', render: p => p.fte },
-  { label: 'Sign Date', render: p => fmt(p.signDate) },
-  { label: 'Start Date', render: p => fmt(p.startDate) },
-  { label: 'Withdrawal', render: p => p.withdrawDate ? fmt(p.withdrawDate) : '—' },
+  { h:'Name',         r: p => `<span class="pname">${p['Name']||'—'}</span>` },
+  { h:'Type',         r: p => `<span class="pill p-blue">${p['Provider Type']||'—'}</span>` },
+  { h:'NPI',          r: p => `<span class="npi">${p['Provider NPI']||'—'}</span>` },
+  { h:'Chief',        r: p => p['Chief Name']||'—' },
+  { h:'FTE',          r: p => p['FTE Ratio']||'—' },
+  { h:'Sign Date',    r: p => fmtDate(p['Sign Date']) },
+  { h:'Start Date',   r: p => fmtDate(p['Start Date (Cohort)']) },
+  { h:'Withdrawal',   r: p => p['Withdrawal Date'] ? fmtDate(p['Withdrawal Date']) : '—' },
 ];
 
-const TEAM_EXTRA_COLS = {
+const EXTRA = {
   talent: [
-    { label: 'Complete Lic.', render: p => p.completeLicenses },
-    { label: 'Incomplete Lic.', render: p => p.incompleteLicenses > 0 ? `<span class="pill pill-amber">${p.incompleteLicenses}</span>` : `<span class="pill pill-green">0</span>` },
-    { label: 'Cred. Date', render: p => fmt(p.credDate) },
-    { label: 'Primary Market', render: p => p.primaryMarket },
-    { label: 'Schedule', render: p => boolPill(p.schedCreated, 'Created', 'Pending') },
-    { label: 'Laptop', render: p => boolPill(p.laptopSetup, 'Ready', 'Pending') },
+    { h:'Complete Lic.',   r: p => p['Complete Licenses']||'0' },
+    { h:'Incomplete Lic.', r: p => p['Incomplete Licenses']>0 ? `<span class="pill p-amber">${p['Incomplete Licenses']}</span>` : `<span class="pill p-green">0</span>` },
+    { h:'Cred. Date',      r: p => fmtDate(p['Committee Approval Date for Credentialing']) },
+    { h:'Primary Market',  r: p => p['Primary eCW Market']||'—' },
+    { h:'Schedule',        r: p => boolPill(p['Schedule Created'],'Created','Pending') },
+    { h:'Laptop',          r: p => boolPill(p['Laptop Set Up'],'Ready','Pending') },
   ],
   licensing: [
-    { label: 'Complete Lic.', render: p => p.completeLicenses },
-    { label: 'Incomplete Lic.', render: p => p.incompleteLicenses },
-    { label: 'Active Lic.', render: p => p.activeLicenses },
-    { label: 'Open Markets', render: p => (p.openMarkets||[]).join(', ') },
-    { label: 'Open Mkt Count', render: p => p.openMarketsCount },
-    { label: 'Avail. Lic.', render: p => p.licensesAvailable },
-    { label: 'In Progress Lic.', render: p => p.inProgressLicenses },
-    { label: 'Active DEAs', render: p => p.activeDeas },
-    { label: 'In Prog. DEAs', render: p => p.inProgressDeas },
-    { label: 'Active CSRs', render: p => p.activeCsrs },
-    { label: 'In Prog. CSRs', render: p => p.inProgressCsrs },
-    { label: 'NY/TX Lic.', render: p => p.nyOrTx ? `<span class="pill pill-purple">${p.nyOrTx}</span>` : '—' },
-    { label: 'Cred. Date', render: p => fmt(p.credDate) },
+    { h:'Complete Lic.',    r: p => p['Complete Licenses']||'0' },
+    { h:'Incomplete Lic.',  r: p => p['Incomplete Licenses']||'0' },
+    { h:'Active Lic.',      r: p => p['Active Licenses']||'0' },
+    { h:'Open Markets',     r: p => p['Open Markets']||'—' },
+    { h:'Open Mkt Count',   r: p => p['Open Markets Count']||'0' },
+    { h:'Avail. Lic.',      r: p => p['Licenses Available to Turn On']||'0' },
+    { h:'In Prog. Lic.',    r: p => p['In Progress Licenses']||'0' },
+    { h:'Active DEAs',      r: p => p['Active DEAs']||'0' },
+    { h:'In Prog. DEAs',    r: p => p['In Progress DEAs']||'0' },
+    { h:'Active CSRs',      r: p => p['Active CSRs']||'0' },
+    { h:'In Prog. CSRs',    r: p => p['In Progress CSRs']||'0' },
+    { h:'NY/TX Lic.',       r: p => p['NY License or TX License'] ? `<span class="pill p-purple">${p['NY License or TX License']}</span>` : '—' },
+    { h:'Cred. Date',       r: p => fmtDate(p['Committee Approval Date for Credentialing']) },
   ],
   informatics: [
-    { label: 'Primary Market', render: p => p.primaryMarket },
-    { label: 'Schedule', render: p => boolPill(p.schedCreated, 'Created', 'Pending') },
+    { h:'Primary Market',  r: p => p['Primary eCW Market']||'—' },
+    { h:'Schedule',        r: p => boolPill(p['Schedule Created'],'Created','Pending') },
   ],
   coreops: [
-    { label: 'Wk 1', render: p => p.w1Patients },
-    { label: 'Wk 2', render: p => p.w2Patients },
-    { label: 'Wk 3', render: p => p.w3Patients },
-    { label: 'Wk 4', render: p => p.w4Patients },
-    { label: 'Total', render: p => `<strong>${p.totalPatients}</strong>` },
+    { h:'Wk 1',   r: p => p['Week 1 Scheduled Patients']||'0' },
+    { h:'Wk 2',   r: p => p['Week 2 Scheduled Patients']||'0' },
+    { h:'Wk 3',   r: p => p['Week 3 Scheduled Patients']||'0' },
+    { h:'Wk 4',   r: p => p['Week 4 Scheduled Patients']||'0' },
+    { h:'Total',  r: p => `<strong>${p['Total Scheduled Patients']||'0'}</strong>` },
   ],
   it: [
-    { label: 'Laptop Setup', render: p => boolPill(p.laptopSetup, 'Complete', 'Pending') },
+    { h:'Laptop Setup', r: p => boolPill(p['Laptop Set Up'],'Complete','Pending') },
   ],
   hr: [
-    { label: 'ADP Setup', render: p => boolPill(p.adpSetup, 'Complete', 'Pending') },
+    { h:'ADP Setup', r: p => boolPill(p['ADP Set Up Complete'],'Complete','Pending') },
   ],
   marketing: [
-    { label: 'Synapse Profile', render: p => boolPill(p.synapseProfile, 'Active', 'Inactive') },
-    { label: 'Primary Loc.', render: p => p.synapseLoc },
-    { label: 'Matching', render: p => boolPill(p.matchingEnabled, 'On', 'Off') },
-    { label: 'New Patients', render: p => boolPill(p.newPatientEnabled, 'On', 'Off') },
-    { label: 'NP Max', render: p => p.npMax },
-    { label: 'ADHD', render: p => boolPill(p.adhdEnabled, 'On', 'Off') },
-    { label: 'CS Disabled', render: p => p.csDisabled ? `<span class="pill pill-red">Yes</span>` : `<span class="pill pill-green">No</span>` },
+    { h:'Synapse Profile',   r: p => boolPill(p['Synapse Profile'],'Active','Inactive') },
+    { h:'Primary Location',  r: p => p['Primary Synapse Location']||'—' },
+    { h:'Matching',          r: p => boolPill(p['Matching Enabled'],'On','Off') },
+    { h:'New Patients',      r: p => boolPill(p['New Patient Enabled'],'On','Off') },
+    { h:'NP Max',            r: p => p['NP Max']||'—' },
+    { h:'ADHD',              r: p => boolPill(p['ADHD Enabled'],'On','Off') },
+    { h:'CS Disabled',       r: p => (p['CS Disabled']||'').toUpperCase()==='YES' ? `<span class="pill p-red">Yes</span>` : `<span class="pill p-green">No</span>` },
   ],
   credentialing: [
-    { label: 'Committee Approval Date', render: p => fmt(p.credDate) },
+    { h:'Committee Approval Date', r: p => fmtDate(p['Committee Approval Date for Credentialing']) },
   ],
 };
 
 function buildTable(providers, team) {
-  const extraCols = team === 'all' ? TEAM_EXTRA_COLS.talent : (TEAM_EXTRA_COLS[team] || []);
-  const cols = [...BASE_COLS, ...extraCols];
-
-  if (providers.length === 0) {
-    return `<div class="no-providers">No providers match the current filters.</div>`;
-  }
-
-  const thead = cols.map(c => `<th>${c.label} <span class="sort-icon">↕</span></th>`).join('');
-  const tbody = providers.map(p => {
-    const cells = cols.map(c => `<td>${c.render(p)}</td>`).join('');
-    return `<tr>${cells}</tr>`;
-  }).join('');
-
-  return `<div class="table-scroll"><table>
-    <thead><tr>${thead}</tr></thead>
-    <tbody>${tbody}</tbody>
-  </table></div>`;
+  const extra = team === 'all' ? EXTRA.talent : (EXTRA[team] || []);
+  const cols = [...BASE_COLS, ...extra];
+  if (!providers.length) return `<div class="empty">No providers match the current filters.</div>`;
+  const head = cols.map(c => `<th>${c.h}</th>`).join('');
+  const body = providers.map(p => `<tr>${cols.map(c=>`<td>${c.r(p)}</td>`).join('')}</tr>`).join('');
+  return `<div class="tbl-scroll"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
-// ─── RENDER ─────────────────────────────────────────────────────────────────
+// ── RENDER ────────────────────────────────────────────────────────────────
 function render() {
-  const cohorts = getFilteredCohorts();
-  const providers = getFilteredProviders();
+  const cohorts   = filterCohorts();
+  const providers = filterProviders();
   const team = currentTeam;
-  const el = document.getElementById('mainContent');
+  const teamName = {all:'All Teams',talent:'Talent Acquisition',licensing:'Licensing',informatics:'Clinical Informatics',coreops:'Core Operations',it:'IT',hr:'HR',marketing:'Digital Marketing',credentialing:'Credentialing'}[team]||team;
 
   let html = '';
 
   if (currentView === 'cohort') {
-    html += `<div class="section-header"><span class="section-title">Cohort Summary — ${teamLabel(team)}</span><span style="font-size:11px;color:var(--text-muted)">${cohorts.length} cohort${cohorts.length !== 1 ? 's' : ''}</span></div>`;
-    if (cohorts.length === 0) {
-      html += `<div class="empty-state">No cohorts match the current filters.</div>`;
+    html += `<div class="sec-hdr"><span class="sec-title">Cohort Summary — ${teamName}</span><span style="font-size:11px;color:var(--text-muted)">${cohorts.length} cohort${cohorts.length!==1?'s':''}</span></div>`;
+    if (!cohorts.length) {
+      html += `<div class="empty" style="padding:48px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);margin-bottom:32px">No cohorts match the current filters.</div>`;
     } else {
-      html += `<div class="cohort-grid">`;
-      cohorts.forEach(c => { html += buildCohortCard(c, team); });
-      html += `</div>`;
+      html += `<div class="cohort-grid">${cohorts.map(c=>buildCohortCard(c,team)).join('')}</div>`;
     }
   } else {
-    html += `<div class="section-header" style="margin-bottom:12px"><span class="section-title">Provider Detail — ${teamLabel(team)}</span><span style="font-size:11px;color:var(--text-muted)">${providers.length} provider${providers.length !== 1 ? 's' : ''}</span></div>`;
-    html += `<div class="table-section"><div class="table-wrapper">${buildTable(providers, team)}</div></div>`;
+    html += `<div class="sec-hdr"><span class="sec-title">Provider Detail — ${teamName}</span><span style="font-size:11px;color:var(--text-muted)">${providers.length} provider${providers.length!==1?'s':''}</span></div>`;
+    html += `<div class="tbl-wrap">${buildTable(providers,team)}</div>`;
   }
 
-  el.innerHTML = html;
+  document.getElementById('main').innerHTML = html;
 }
 
-function teamLabel(t) {
-  const map = {
-    all: 'All Teams', talent: 'Talent Acquisition', licensing: 'Licensing',
-    informatics: 'Clinical Informatics', coreops: 'Core Operations',
-    it: 'IT', hr: 'HR', marketing: 'Digital Marketing', credentialing: 'Credentialing'
-  };
-  return map[t] || t;
-}
-
-function switchTeam(val) {
-  currentTeam = val;
-  document.querySelectorAll('.team-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.team === val);
-  });
-  render();
-}
-
+// ── CONTROLS ──────────────────────────────────────────────────────────────
 function switchTeamTab(val) {
   currentTeam = val;
-  document.getElementById('filterTeam').value = val;
-  document.querySelectorAll('.team-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.team === val);
-  });
+  document.getElementById('teamFilter').value = val;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.team === val));
   render();
 }
-
+function switchTeamSelect(val) {
+  currentTeam = val;
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.team === val));
+  render();
+}
 function setView(v, btn) {
   currentView = v;
-  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.vt-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   render();
 }
 
-function applyFilters() {
-  filterDate = document.getElementById('filterStartDate').value;
-  filterType = document.getElementById('filterProviderType').value;
-  render();
-}
-
-// Init
-document.getElementById('lastUpdated').textContent = 'Updated ' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-render();
+// ── INIT ──────────────────────────────────────────────────────────────────
+loadData();
 </script>
 </body>
 </html>
