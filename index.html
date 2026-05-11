@@ -202,66 +202,63 @@ tbody td { padding: 7px 11px; vertical-align: middle; color: var(--text); }
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────
-const SHEET_ID = '2PACX-1vSZ57mblhXx0_qJUd4EwGvBZmfqhIN6rR1Ns7CHmKriQEIPyTmqRpdVOzjPWaeRcH3EbfhD17e0TJzw';
-const BASE = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?output=csv`;
-const COHORT_URL_NAME  = `${BASE}&gid=1220218466`;
-const OVERVIEW_URL_NAME = `${BASE}&gid=190847842`;
+const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/talkiatry.com/s/AKfycbzIV9Ewchjc8xpPYHxD3JSz95hr9ws6PvcIHJFfC7dHfWmQpvE_vUEaZAE9hjVGbtUoGw/exec';
 
 // ── STATE ─────────────────────────────────────────────────────────────────
 let rawCohorts = [], rawProviders = [];
 let currentTeam = 'all', currentView = 'cohort';
 let selectedDates = new Set(); // empty = all
 
-// ── CSV PARSER ────────────────────────────────────────────────────────────
-function parseCSV(text) {
-  const lines = text.split('\n');
-  if (lines.length < 2) return [];
-  const headers = splitCSVRow(lines[0]).map(h => h.trim().replace(/^"|"$/g,''));
+// ── HELPERS ───────────────────────────────────────────────────────────────
+// Convert array-of-arrays (from Apps Script) into array-of-objects using row 0 as headers
+function arraysToObjects(data) {
+  if (!data || data.length < 2) return [];
+  const headers = data[0].map(h => String(h).trim());
   const rows = [];
-  for (let i = 1; i < lines.length; i++) {
-    const vals = splitCSVRow(lines[i]).map(v => v.trim().replace(/^"|"$/g,''));
-    if (vals.every(v => !v)) continue;
+  for (let i = 1; i < data.length; i++) {
+    const vals = data[i];
+    if (vals.every(v => v === '' || v === null || v === undefined)) continue;
     const obj = {};
-    headers.forEach((h, idx) => { obj[h] = vals[idx] || ''; });
+    headers.forEach((h, idx) => { obj[h] = vals[idx] !== undefined ? String(vals[idx]) : ''; });
     rows.push(obj);
   }
   return rows;
 }
 
-function splitCSVRow(row) {
-  const result = []; let cur = ''; let inQ = false;
-  for (let i = 0; i < row.length; i++) {
-    const ch = row[i];
-    if (ch === '"') { inQ = !inQ; }
-    else if (ch === ',' && !inQ) { result.push(cur); cur = ''; }
-    else { cur += ch; }
-  }
-  result.push(cur);
-  return result;
-}
-
-// ── FETCH ─────────────────────────────────────────────────────────────────
-async function fetchSheet(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return parseCSV(await res.text());
-}
-
-async function loadData() {
+// ── FETCH via JSONP (bypasses CORS/auth for Talkiatry domain) ────────────
+function loadData() {
   document.getElementById('main').innerHTML = '<div class="loading"><div class="spinner"></div>Loading data from Google Sheets…</div>';
-  try {
-    const [cohorts, providers] = await Promise.all([
-      fetchSheet(COHORT_URL_NAME),
-      fetchSheet(OVERVIEW_URL_NAME)
-    ]);
-    rawCohorts = cohorts;
-    rawProviders = providers;
-    document.getElementById('lastUpd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
-    buildDateFilter();
-    render();
-  } catch(e) {
-    document.getElementById('main').innerHTML = `<div class="error-box">⚠ Could not load data: ${e.message}. Make sure your Google Sheet is published to the web.</div>`;
-  }
+
+  // Remove any previous JSONP script tag
+  const old = document.getElementById('jsonp-script');
+  if (old) old.remove();
+
+  // Set a timeout in case the script never calls back
+  const timer = setTimeout(() => {
+    document.getElementById('main').innerHTML = '<div class="error-box">⚠ Request timed out. Make sure you are logged into your Talkiatry Google account, then click ↻ Refresh.</div>';
+  }, 10000);
+
+  window.__dashboardCallback = function(json) {
+    clearTimeout(timer);
+    try {
+      rawCohorts   = arraysToObjects(json.cohort);
+      rawProviders = arraysToObjects(json.overview);
+      document.getElementById('lastUpd').textContent = 'Updated ' + new Date().toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
+      buildDateFilter();
+      render();
+    } catch(e) {
+      document.getElementById('main').innerHTML = `<div class="error-box">⚠ Error parsing data: ${e.message}</div>`;
+    }
+  };
+
+  const script = document.createElement('script');
+  script.id = 'jsonp-script';
+  script.src = APPS_SCRIPT_URL + '?callback=__dashboardCallback';
+  script.onerror = () => {
+    clearTimeout(timer);
+    document.getElementById('main').innerHTML = '<div class="error-box">⚠ Could not reach the Apps Script. Make sure you are logged into your Talkiatry Google account and try refreshing.</div>';
+  };
+  document.head.appendChild(script);
 }
 
 // ── DATE FILTER ───────────────────────────────────────────────────────────
