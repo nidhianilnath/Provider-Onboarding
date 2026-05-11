@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Provider Onboarding Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: #e2e0d8;
+    --border-strong: #c8c6bc;
+    --text: #1a1917;
+    --text-secondary: #6b6a64;
+    --text-muted: #9c9b95;
+    --accent: #1a3a2a;
+    --accent-light: #e8f0eb;
+    --accent-mid: #4a7c5f;
+    --green: #2d6a4f;
+    --green-bg: #d8f3dc;
+    --green-text: #1b4332;
+    --red: #c1121f;
+    --red-bg: #ffe5e5;
+    --red-text: #7d0000;
+    --amber: #b45309;
+    --amber-bg: #fef3c7;
+    --amber-text: #78350f;
+    --blue: #1e40af;
+    --blue-bg: #dbeafe;
+    --blue-text: #1e3a8a;
+    --purple: #6d28d9;
+    --purple-bg: #ede9fe;
+    --purple-text: #4c1d95;
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--accent);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .header-title {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .header-sub {
+    font-size: 12px;
+    opacity: 0.6;
+    margin-top: 1px;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .last-updated {
+    font-size: 11px;
+    opacity: 0.5;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* FILTERS */
+  .filters-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .filter-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  select, input[type="date"] {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  select:hover, input[type="date"]:hover { border-color: var(--border-strong); }
+  select:focus, input[type="date"]:focus { border-color: var(--accent-mid); box-shadow: 0 0 0 2px rgba(74,124,95,0.15); }
+
+  /* TEAM TABS */
+  .team-tabs {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+  .team-tab {
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .team-tab:hover { color: var(--text); background: var(--surface2); }
+  .team-tab.active { color: var(--accent); border-bottom-color: var(--accent-mid); }
+
+  /* MAIN CONTENT */
+  .main { padding: 20px 24px; max-width: 1400px; }
+
+  /* COHORT SUMMARY */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .cohort-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .cohort-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .cohort-card-header {
+    background: var(--accent);
+    color: white;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .cohort-date {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .cohort-category {
+    font-size: 11px;
+    opacity: 0.65;
+    margin-top: 2px;
+  }
+  .countdown-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    background: rgba(255,255,255,0.15);
+    padding: 3px 8px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .cohort-card-body { padding: 12px 16px; }
+  .cohort-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .stat-box {
+    background: var(--surface2);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-family: 'DM Mono', monospace;
+  }
+  .stat-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+  .go-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 20px;
+  }
+  .go-badge.go { background: var(--green-bg); color: var(--green-text); }
+  .go-badge.nogo { background: var(--red-bg); color: var(--red-text); }
+  .go-badge.pending { background: var(--amber-bg); color: var(--amber-text); }
+
+  /* PROVIDER TABLE */
+  .table-section { margin-bottom: 32px; }
+  .table-wrapper {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .table-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-count {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'DM Mono', monospace;
+  }
+  .search-input {
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 12px;
+    width: 200px;
+  }
+  .table-scroll { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    min-width: 600px;
+  }
+  thead th {
+    background: var(--surface2);
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    position: sticky;
+    top: 0;
+  }
+  thead th:hover { background: var(--border); }
+  thead th .sort-icon { opacity: 0.4; margin-left: 3px; }
+  thead th.sorted .sort-icon { opacity: 1; color: var(--accent-mid); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface2); }
+  tbody td { padding: 8px 12px; color: var(--text); vertical-align: middle; }
+  .provider-name { font-weight: 500; }
+  .npi-code { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); }
+  .pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+  .pill-green { background: var(--green-bg); color: var(--green-text); }
+  .pill-red { background: var(--red-bg); color: var(--red-text); }
+  .pill-amber { background: var(--amber-bg); color: var(--amber-text); }
+  .pill-blue { background: var(--blue-bg); color: var(--blue-text); }
+  .pill-gray { background: var(--surface2); color: var(--text-secondary); }
+  .pill-purple { background: var(--purple-bg); color: var(--purple-text); }
+  .empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+  }
+
+  /* TEAM PANEL */
+  .team-panel { display: none; }
+  .team-panel.active { display: block; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .header { padding: 12px 16px; }
+    .filters-bar { padding: 10px 16px; }
+    .main { padding: 16px; }
+    .cohort-grid { grid-template-columns: 1fr; }
+  }
+
+  .view-toggle {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .view-btn {
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    transition: all 0.15s;
+  }
+  .view-btn.active { background: var(--accent); color: white; }
+
+  .no-providers {
+    padding: 32px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div>
+    <div class="header-title">Provider Onboarding Dashboard</div>
+    <div class="header-sub">Cohort tracking &amp; team readiness</div>
+  </div>
+  <div class="header-right">
+    <span class="last-updated" id="lastUpdated"></span>
+  </div>
+</header>
+
+<div class="filters-bar">
+  <span class="filter-label">Filters</span>
+  <div class="filter-group">
+    <label class="filter-label" for="filterStartDate">Start Date</label>
+    <input type="date" id="filterStartDate" onchange="applyFilters()">
+  </div>
+  <div class="filter-group">
+    <label class="filter-label" for="filterProviderType">Provider Type</label>
+    <select id="filterProviderType" onchange="applyFilters()">
+      <option value="">All Types</option>
+      <option>MD</option>
+      <option>DO</option>
+      <option>NP</option>
+      <option>PA</option>
+      <option>LCSW</option>
+      <option>Psychiatrist</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label class="filter-label" for="filterTeam">Team</label>
+    <select id="filterTeam" onchange="switchTeam(this.value)">
+      <option value="all">All Teams</option>
+      <option value="talent">Talent Acquisition</option>
+      <option value="licensing">Licensing</option>
+      <option value="informatics">Clinical Informatics</option>
+      <option value="coreops">Core Operations</option>
+      <option value="it">IT</option>
+      <option value="hr">HR</option>
+      <option value="marketing">Digital Marketing</option>
+      <option value="credentialing">Credentialing</option>
+    </select>
+  </div>
+  <div style="margin-left:auto;" class="view-toggle">
+    <button class="view-btn active" onclick="setView('cohort',this)">Cohort Summary</button>
+    <button class="view-btn" onclick="setView('detail',this)">Detail View</button>
+  </div>
+</div>
+
+<div class="team-tabs" id="teamTabs">
+  <div class="team-tab active" data-team="all" onclick="switchTeamTab('all')">All Teams</div>
+  <div class="team-tab" data-team="talent" onclick="switchTeamTab('talent')">Talent Acquisition</div>
+  <div class="team-tab" data-team="licensing" onclick="switchTeamTab('licensing')">Licensing</div>
+  <div class="team-tab" data-team="informatics" onclick="switchTeamTab('informatics')">Clinical Informatics</div>
+  <div class="team-tab" data-team="coreops" onclick="switchTeamTab('coreops')">Core Operations</div>
+  <div class="team-tab" data-team="it" onclick="switchTeamTab('it')">IT</div>
+  <div class="team-tab" data-team="hr" onclick="switchTeamTab('hr')">HR</div>
+  <div class="team-tab" data-team="marketing" onclick="switchTeamTab('marketing')">Digital Marketing</div>
+  <div class="team-tab" data-team="credentialing" onclick="switchTeamTab('credentialing')">Credentialing</div>
+</div>
+
+<div class="main" id="mainContent"></div>
+
+<script>
+// ─── SAMPLE DATA ───────────────────────────────────────────────────────────
+const COHORTS = [
+  {
+    startDate: '2025-07-07', category: 'Physician', goNogo: 'go',
+    openMarkets: 3, completeMarkets: 5, incompleteMarkets: 2,
+    credDate: '2025-06-15', schedBlocks: 'Complete', patientSched: 14, techSetup: 'Complete', adpSetup: 'Complete', profilesActivated: 8
+  },
+  {
+    startDate: '2025-08-04', category: 'NP/PA', goNogo: 'pending',
+    openMarkets: 1, completeMarkets: 3, incompleteMarkets: 5,
+    credDate: '2025-07-20', schedBlocks: 'In Progress', patientSched: 0, techSetup: 'In Progress', adpSetup: 'Complete', profilesActivated: 2
+  },
+  {
+    startDate: '2025-09-08', category: 'Mixed', goNogo: 'nogo',
+    openMarkets: 0, completeMarkets: 1, incompleteMarkets: 9,
+    credDate: 'TBD', schedBlocks: 'Not Started', patientSched: 0, techSetup: 'Not Started', adpSetup: 'Not Started', profilesActivated: 0
+  }
+];
+
+const PROVIDERS = [
+  {
+    name: 'Dr. Sarah Chen', type: 'MD', npi: '1234567890', chief: 'Dr. Marcus Webb',
+    fte: 1.0, signDate: '2025-04-15', startDate: '2025-07-07', withdrawDate: '',
+    completeLicenses: 5, incompleteLicenses: 0, activeLicenses: 5, openMarkets: ['NY','CA','TX'],
+    openMarketsCount: 3, licensesAvailable: 5, inProgressLicenses: 0,
+    activeDeas: 2, inProgressDeas: 0, activeCsrs: 2, inProgressCsrs: 0,
+    nyOrTx: 'NY', credDate: '2025-06-15',
+    primaryMarket: 'New York', schedCreated: true, laptopSetup: true,
+    w1Patients: 18, w2Patients: 22, w3Patients: 25, w4Patients: 24, totalPatients: 89,
+    adpSetup: true,
+    synapseProfile: 'Active', synapseLoc: 'NY-Manhattan', matchingEnabled: true,
+    newPatientEnabled: true, npMax: 30, adhdEnabled: true, csDisabled: false
+  },
+  {
+    name: 'James Okafor, NP', type: 'NP', npi: '0987654321', chief: 'Dr. Lisa Park',
+    fte: 0.8, signDate: '2025-04-28', startDate: '2025-07-07', withdrawDate: '',
+    completeLicenses: 3, incompleteLicenses: 2, activeLicenses: 3, openMarkets: ['FL','GA'],
+    openMarketsCount: 2, licensesAvailable: 3, inProgressLicenses: 2,
+    activeDeas: 1, inProgressDeas: 1, activeCsrs: 1, inProgressCsrs: 1,
+    nyOrTx: '', credDate: '2025-06-15',
+    primaryMarket: 'Florida', schedCreated: true, laptopSetup: false,
+    w1Patients: 12, w2Patients: 15, w3Patients: 18, w4Patients: 20, totalPatients: 65,
+    adpSetup: true,
+    synapseProfile: 'Pending', synapseLoc: 'FL-Miami', matchingEnabled: false,
+    newPatientEnabled: false, npMax: 25, adhdEnabled: false, csDisabled: false
+  },
+  {
+    name: 'Dr. Priya Nair', type: 'DO', npi: '1122334455', chief: 'Dr. Marcus Webb',
+    fte: 1.0, signDate: '2025-05-01', startDate: '2025-08-04', withdrawDate: '',
+    completeLicenses: 4, incompleteLicenses: 1, activeLicenses: 4, openMarkets: ['TX'],
+    openMarketsCount: 1, licensesAvailable: 4, inProgressLicenses: 1,
+    activeDeas: 2, inProgressDeas: 0, activeCsrs: 1, inProgressCsrs: 1,
+    nyOrTx: 'TX', credDate: '2025-07-20',
+    primaryMarket: 'Texas', schedCreated: false, laptopSetup: false,
+    w1Patients: 0, w2Patients: 0, w3Patients: 0, w4Patients: 0, totalPatients: 0,
+    adpSetup: false,
+    synapseProfile: 'Not Started', synapseLoc: 'TX-Houston', matchingEnabled: false,
+    newPatientEnabled: false, npMax: 28, adhdEnabled: false, csDisabled: true
+  },
+  {
+    name: 'Rachel Torres, PA', type: 'PA', npi: '5566778899', chief: 'Dr. Lisa Park',
+    fte: 0.6, signDate: '2025-05-10', startDate: '2025-08-04', withdrawDate: '',
+    completeLicenses: 2, incompleteLicenses: 3, activeLicenses: 2, openMarkets: ['NY','NJ'],
+    openMarketsCount: 2, licensesAvailable: 2, inProgressLicenses: 3,
+    activeDeas: 0, inProgressDeas: 2, activeCsrs: 0, inProgressCsrs: 2,
+    nyOrTx: 'NY', credDate: '2025-07-20',
+    primaryMarket: 'New Jersey', schedCreated: false, laptopSetup: false,
+    w1Patients: 0, w2Patients: 0, w3Patients: 0, w4Patients: 0, totalPatients: 0,
+    adpSetup: false,
+    synapseProfile: 'Not Started', synapseLoc: 'NJ-Newark', matchingEnabled: false,
+    newPatientEnabled: false, npMax: 20, adhdEnabled: false, csDisabled: false
+  },
+  {
+    name: 'Dr. Kevin Zhao', type: 'Psychiatrist', npi: '9900112233', chief: 'Dr. Marcus Webb',
+    fte: 1.0, signDate: '2025-05-20', startDate: '2025-09-08', withdrawDate: '',
+    completeLicenses: 1, incompleteLicenses: 4, activeLicenses: 1, openMarkets: ['CA'],
+    openMarketsCount: 1, licensesAvailable: 1, inProgressLicenses: 4,
+    activeDeas: 0, inProgressDeas: 1, activeCsrs: 0, inProgressCsrs: 1,
+    nyOrTx: '', credDate: 'TBD',
+    primaryMarket: 'California', schedCreated: false, laptopSetup: false,
+    w1Patients: 0, w2Patients: 0, w3Patients: 0, w4Patients: 0, totalPatients: 0,
+    adpSetup: false,
+    synapseProfile: 'Not Started', synapseLoc: 'CA-Los Angeles', matchingEnabled: false,
+    newPatientEnabled: false, npMax: 22, adhdEnabled: true, csDisabled: false
+  }
+];
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+let currentTeam = 'all';
+let currentView = 'cohort';
+let filterDate = '';
+let filterType = '';
+
+// ─── UTILS ──────────────────────────────────────────────────────────────────
+function countdown(dateStr) {
+  if (!dateStr || dateStr === 'TBD') return 'TBD';
+  const diff = Math.ceil((new Date(dateStr) - new Date()) / 86400000);
+  if (diff < 0) return `${Math.abs(diff)}d ago`;
+  if (diff === 0) return 'Today';
+  return `${diff}d`;
+}
+
+function fmt(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function boolPill(val, trueLabel, falseLabel) {
+  if (val === true || val === 'Complete' || val === 'Active') {
+    return `<span class="pill pill-green">${trueLabel || '✓'}</span>`;
+  }
+  if (val === 'In Progress' || val === 'Pending') {
+    return `<span class="pill pill-amber">${val}</span>`;
+  }
+  if (val === false || val === 'Not Started') {
+    return `<span class="pill pill-red">${falseLabel || '—'}</span>`;
+  }
+  return `<span class="pill pill-gray">${val}</span>`;
+}
+
+function getFilteredProviders() {
+  return PROVIDERS.filter(p => {
+    if (filterDate && p.startDate !== filterDate) return false;
+    if (filterType && p.type !== filterType) return false;
+    return true;
+  });
+}
+
+function getFilteredCohorts() {
+  return COHORTS.filter(c => {
+    if (filterDate && c.startDate !== filterDate) return false;
+    return true;
+  });
+}
+
+// ─── COHORT CARD BUILDER ────────────────────────────────────────────────────
+function buildCohortCard(c, team) {
+  const cd = countdown(c.startDate);
+  const cdClass = cd.includes('ago') ? 'style="color:#c1121f"' : '';
+  const goLabel = c.goNogo === 'go' ? 'Go ✓' : c.goNogo === 'nogo' ? 'No-Go ✗' : 'Pending';
+  const goClass = c.goNogo;
+
+  let stats = `<div class="stat-box"><div class="stat-value go-badge ${goClass}">${goLabel}</div><div class="stat-label">Go / No-Go</div></div>`;
+
+  const statBlock = (val, label) =>
+    `<div class="stat-box"><div class="stat-value">${val}</div><div class="stat-label">${label}</div></div>`;
+
+  if (team === 'all' || team === 'talent') {
+    stats += statBlock(c.openMarkets, 'Open Markets') + statBlock(c.completeMarkets, 'Complete Markets') + statBlock(c.incompleteMarkets, 'Incomplete');
+  } else if (team === 'licensing') {
+    stats += statBlock(c.openMarkets, 'Open Markets') + statBlock(c.completeMarkets, 'Complete') + statBlock(c.incompleteMarkets, 'Incomplete') + statBlock(c.credDate !== 'TBD' ? fmt(c.credDate) : 'TBD', 'Cred. Date');
+  } else if (team === 'informatics') {
+    stats += statBlock(c.schedBlocks, 'Schedule & Blocks');
+  } else if (team === 'coreops') {
+    stats += statBlock(c.patientSched, 'Wk 1 Patients');
+  } else if (team === 'it') {
+    stats += statBlock(c.techSetup, 'Tech Setup');
+  } else if (team === 'hr') {
+    stats += statBlock(c.adpSetup, 'ADP Setup');
+  } else if (team === 'marketing') {
+    stats += statBlock(c.profilesActivated, 'Profiles Activated');
+  } else if (team === 'credentialing') {
+    stats += statBlock(c.credDate !== 'TBD' ? fmt(c.credDate) : 'TBD', 'Credentialing Date');
+  }
+
+  return `<div class="cohort-card">
+    <div class="cohort-card-header">
+      <div>
+        <div class="cohort-date">${fmt(c.startDate)}</div>
+        <div class="cohort-category">${c.category}</div>
+      </div>
+      <div class="countdown-badge" ${cdClass}>${cd}</div>
+    </div>
+    <div class="cohort-card-body">
+      <div class="cohort-stats">${stats}</div>
+    </div>
+  </div>`;
+}
+
+// ─── TABLE COLUMN CONFIGS ───────────────────────────────────────────────────
+const BASE_COLS = [
+  { label: 'Name', render: p => `<span class="provider-name">${p.name}</span>` },
+  { label: 'Type', render: p => `<span class="pill pill-blue">${p.type}</span>` },
+  { label: 'NPI', render: p => `<span class="npi-code">${p.npi}</span>` },
+  { label: 'Chief', render: p => p.chief },
+  { label: 'FTE', render: p => p.fte },
+  { label: 'Sign Date', render: p => fmt(p.signDate) },
+  { label: 'Start Date', render: p => fmt(p.startDate) },
+  { label: 'Withdrawal', render: p => p.withdrawDate ? fmt(p.withdrawDate) : '—' },
+];
+
+const TEAM_EXTRA_COLS = {
+  talent: [
+    { label: 'Complete Lic.', render: p => p.completeLicenses },
+    { label: 'Incomplete Lic.', render: p => p.incompleteLicenses > 0 ? `<span class="pill pill-amber">${p.incompleteLicenses}</span>` : `<span class="pill pill-green">0</span>` },
+    { label: 'Cred. Date', render: p => fmt(p.credDate) },
+    { label: 'Primary Market', render: p => p.primaryMarket },
+    { label: 'Schedule', render: p => boolPill(p.schedCreated, 'Created', 'Pending') },
+    { label: 'Laptop', render: p => boolPill(p.laptopSetup, 'Ready', 'Pending') },
+  ],
+  licensing: [
+    { label: 'Complete Lic.', render: p => p.completeLicenses },
+    { label: 'Incomplete Lic.', render: p => p.incompleteLicenses },
+    { label: 'Active Lic.', render: p => p.activeLicenses },
+    { label: 'Open Markets', render: p => (p.openMarkets||[]).join(', ') },
+    { label: 'Open Mkt Count', render: p => p.openMarketsCount },
+    { label: 'Avail. Lic.', render: p => p.licensesAvailable },
+    { label: 'In Progress Lic.', render: p => p.inProgressLicenses },
+    { label: 'Active DEAs', render: p => p.activeDeas },
+    { label: 'In Prog. DEAs', render: p => p.inProgressDeas },
+    { label: 'Active CSRs', render: p => p.activeCsrs },
+    { label: 'In Prog. CSRs', render: p => p.inProgressCsrs },
+    { label: 'NY/TX Lic.', render: p => p.nyOrTx ? `<span class="pill pill-purple">${p.nyOrTx}</span>` : '—' },
+    { label: 'Cred. Date', render: p => fmt(p.credDate) },
+  ],
+  informatics: [
+    { label: 'Primary Market', render: p => p.primaryMarket },
+    { label: 'Schedule', render: p => boolPill(p.schedCreated, 'Created', 'Pending') },
+  ],
+  coreops: [
+    { label: 'Wk 1', render: p => p.w1Patients },
+    { label: 'Wk 2', render: p => p.w2Patients },
+    { label: 'Wk 3', render: p => p.w3Patients },
+    { label: 'Wk 4', render: p => p.w4Patients },
+    { label: 'Total', render: p => `<strong>${p.totalPatients}</strong>` },
+  ],
+  it: [
+    { label: 'Laptop Setup', render: p => boolPill(p.laptopSetup, 'Complete', 'Pending') },
+  ],
+  hr: [
+    { label: 'ADP Setup', render: p => boolPill(p.adpSetup, 'Complete', 'Pending') },
+  ],
+  marketing: [
+    { label: 'Synapse Profile', render: p => boolPill(p.synapseProfile, 'Active', 'Inactive') },
+    { label: 'Primary Loc.', render: p => p.synapseLoc },
+    { label: 'Matching', render: p => boolPill(p.matchingEnabled, 'On', 'Off') },
+    { label: 'New Patients', render: p => boolPill(p.newPatientEnabled, 'On', 'Off') },
+    { label: 'NP Max', render: p => p.npMax },
+    { label: 'ADHD', render: p => boolPill(p.adhdEnabled, 'On', 'Off') },
+    { label: 'CS Disabled', render: p => p.csDisabled ? `<span class="pill pill-red">Yes</span>` : `<span class="pill pill-green">No</span>` },
+  ],
+  credentialing: [
+    { label: 'Committee Approval Date', render: p => fmt(p.credDate) },
+  ],
+};
+
+function buildTable(providers, team) {
+  const extraCols = team === 'all' ? TEAM_EXTRA_COLS.talent : (TEAM_EXTRA_COLS[team] || []);
+  const cols = [...BASE_COLS, ...extraCols];
+
+  if (providers.length === 0) {
+    return `<div class="no-providers">No providers match the current filters.</div>`;
+  }
+
+  const thead = cols.map(c => `<th>${c.label} <span class="sort-icon">↕</span></th>`).join('');
+  const tbody = providers.map(p => {
+    const cells = cols.map(c => `<td>${c.render(p)}</td>`).join('');
+    return `<tr>${cells}</tr>`;
+  }).join('');
+
+  return `<div class="table-scroll"><table>
+    <thead><tr>${thead}</tr></thead>
+    <tbody>${tbody}</tbody>
+  </table></div>`;
+}
+
+// ─── RENDER ─────────────────────────────────────────────────────────────────
+function render() {
+  const cohorts = getFilteredCohorts();
+  const providers = getFilteredProviders();
+  const team = currentTeam;
+  const el = document.getElementById('mainContent');
+
+  let html = '';
+
+  if (currentView === 'cohort') {
+    html += `<div class="section-header"><span class="section-title">Cohort Summary — ${teamLabel(team)}</span><span style="font-size:11px;color:var(--text-muted)">${cohorts.length} cohort${cohorts.length !== 1 ? 's' : ''}</span></div>`;
+    if (cohorts.length === 0) {
+      html += `<div class="empty-state">No cohorts match the current filters.</div>`;
+    } else {
+      html += `<div class="cohort-grid">`;
+      cohorts.forEach(c => { html += buildCohortCard(c, team); });
+      html += `</div>`;
+    }
+  } else {
+    html += `<div class="section-header" style="margin-bottom:12px"><span class="section-title">Provider Detail — ${teamLabel(team)}</span><span style="font-size:11px;color:var(--text-muted)">${providers.length} provider${providers.length !== 1 ? 's' : ''}</span></div>`;
+    html += `<div class="table-section"><div class="table-wrapper">${buildTable(providers, team)}</div></div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+function teamLabel(t) {
+  const map = {
+    all: 'All Teams', talent: 'Talent Acquisition', licensing: 'Licensing',
+    informatics: 'Clinical Informatics', coreops: 'Core Operations',
+    it: 'IT', hr: 'HR', marketing: 'Digital Marketing', credentialing: 'Credentialing'
+  };
+  return map[t] || t;
+}
+
+function switchTeam(val) {
+  currentTeam = val;
+  document.querySelectorAll('.team-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.team === val);
+  });
+  render();
+}
+
+function switchTeamTab(val) {
+  currentTeam = val;
+  document.getElementById('filterTeam').value = val;
+  document.querySelectorAll('.team-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.team === val);
+  });
+  render();
+}
+
+function setView(v, btn) {
+  currentView = v;
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function applyFilters() {
+  filterDate = document.getElementById('filterStartDate').value;
+  filterType = document.getElementById('filterProviderType').value;
+  render();
+}
+
+// Init
+document.getElementById('lastUpdated').textContent = 'Updated ' + new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+render();
+</script>
+</body>
+</html>
