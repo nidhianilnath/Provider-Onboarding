@@ -204,12 +204,8 @@ tbody td { padding: 7px 11px; vertical-align: middle; color: var(--text); }
 // ── CONFIG ────────────────────────────────────────────────────────────────
 const SHEET_ID = '2PACX-1vSZ57mblhXx0_qJUd4EwGvBZmfqhIN6rR1Ns7CHmKriQEIPyTmqRpdVOzjPWaeRcH3EbfhD17e0TJzw';
 const BASE = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?output=csv`;
-const COHORT_URL = `${BASE}&gid=0`;   // will try both tab approaches
-const OVERVIEW_URL = `${BASE}&gid=1`;
-
-// Tab name approach (more reliable):
-const COHORT_URL_NAME  = `${BASE}&single=true&sheet=Cohort%20Summary`;
-const OVERVIEW_URL_NAME = `${BASE}&single=true&sheet=Provider%20Onboarding%20Overview`;
+const COHORT_URL_NAME  = `${BASE}&gid=1220218466`;
+const OVERVIEW_URL_NAME = `${BASE}&gid=190847842`;
 
 // ── STATE ─────────────────────────────────────────────────────────────────
 let rawCohorts = [], rawProviders = [];
